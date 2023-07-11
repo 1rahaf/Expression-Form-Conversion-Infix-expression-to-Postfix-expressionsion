@@ -1,0 +1,252 @@
+#include <iostream>
+
+using namespace std;
+
+struct stack
+{
+    char data[100];
+    int count=0;
+    int size=100;
+};
+
+stack* push(char data,stack* head)
+{
+    
+    head->data[head->count]=data;
+    head->count++;
+    return head;
+}
+bool isEmpty(stack* head)
+{
+    if(head->count==0){
+        return true;
+    }
+    else{
+        return false;
+    }
+    
+}
+char peek(stack* head)
+{
+    return head->data[(head->count)-1];
+}
+int length(stack* head)
+{
+    
+    return head->count;
+}
+
+stack* pop(stack* head)
+{
+   
+    head->count--;
+    return head;
+}
+
+
+void printStack(stack* head)
+{
+    if(head->count==0){
+        cout<<"Stack is empty"<<endl;
+    }
+    else{
+        cout<<"Stack: "<<endl;
+        for (int i=head->count-1; i>=0; i--) {
+            cout<<head->data[i]<<" ";
+        }
+    }
+}
+
+
+int precedence(char character)
+{
+    if(character == '^')
+        return 3;
+    else if(character == '*' || character == '/')
+        return 2;
+    else if(character == '+' || character == '-')
+        return 1;
+    else
+        return -1;
+}
+bool isOperator(char character)
+{
+    return (!isalpha(character) && !isdigit(character));
+}
+string INFIX_TO_POSTFIX(string expr)
+{
+    expr = expr;
+    int l = (int)expr.size();
+    stack* st= new stack();
+    string output;
+    
+    for (int i = 0; i < l; i++) {
+        
+        
+        if (isalpha(expr[i]) || isdigit(expr[i]))
+            output += expr[i];
+        
+        else {
+            if (isOperator(expr[i]))
+            {
+                
+                    while(!isEmpty(st) && precedence(expr[i]) <= precedence(peek(st))) {
+                                    output += peek(st);
+                                    pop(st);
+                    }
+                    
+                    
+                    st=push(expr[i],st);
+                    
+                    
+                
+                
+            }
+        }
+    }
+    while (!isEmpty(st)) {
+        output+=peek(st);
+        st=pop(st);
+        
+    }
+    return output;
+}
+string OperatorsByPrecedence(string expr)
+{
+    expr = expr;
+    int l = (int)expr.size();
+    stack* st= new stack();
+    string output;
+    
+    for (int i = 0; i < l; i++) {
+        
+        
+        if (isalpha(expr[i]) || isdigit(expr[i]))
+        {}
+        
+        else {
+            if (isOperator(expr[i]))
+            {
+                
+                    while(!isEmpty(st) && precedence(expr[i]) <= precedence(peek(st))) {
+                                    output += peek(st);
+                                    pop(st);
+                    }
+                    
+                    
+                    st=push(expr[i],st);
+                    
+                    
+                
+                
+            }
+        }
+    }
+    while (!isEmpty(st)) {
+        output+=peek(st);
+        st=pop(st);
+        
+    }
+    return output;
+}
+int EVLUATE_POSTFIX(const char* exp)
+{
+    
+    stack* st=new stack();
+    int i;
+
+
+    for (i = 0; exp[i]; ++i)
+    {
+
+        if (isdigit(exp[i]))
+        {
+            
+            st=push(exp[i],st);
+        }
+
+        else
+        {
+
+            int val1 = (peek(st)-48);
+            st=pop(st);
+            int val2 = (peek(st)-48);
+            st=pop(st);
+            switch (exp[i])
+            {
+            case '+':
+                    st=push((val2 + val1)+48,st);
+                    
+                    break;
+                case '-':
+                    st=push((val2 - val1)+48,st);
+                   
+                    break;
+            case '*':
+                    st=push( (val2 * val1)+48,st);
+                   
+                    break;
+            case '/':
+                    st=push((val2 / val1)+48,st);
+                    
+                    break;
+            }
+        }
+    }
+    return (peek(st)-48);
+}
+int menu()
+{
+    cout<<"\t************* Expression Conversions/Evaluations Program ***********\n\n";
+    cout<<"Please choose from the menu:\n";
+    cout<<"1- Convert an infix expression to its postfix expression\n";
+    cout<<"2- List the expression operators based on their precedence\n";
+    cout<<"3- Evaluate a postfix expression\n";
+    cout<<"4- Exit\n";
+    cout<<"Please press any number (1-6) to continue:";
+    int choice;
+    cin>>choice;
+    return choice;
+}
+int main()
+{
+    while (1) {
+        int ch=menu();
+        string expr;
+        switch (ch) {
+            case 1:
+                cout<<"\n\n..................................................................................................\n\n";
+                cout<<"-----------------You are working on Converting infix to postfix expression  ------------------------\n";
+                cout<<"Please enter the infix expression:";
+                cin>>expr;
+                cout<<"The postfix expression of "<< expr<<" expression is "<< INFIX_TO_POSTFIX(expr)<<" expression\n";
+                cout<<"\n\n..................................................................................................\n\n";
+                break;
+            case 2:
+                cout<<"\n\n..................................................................................................\n\n";
+                cout<<"-----------------You are working on expression operators based on their precedence  ------------------------\n";
+                cout<<"Please enter the infix expression:";
+                cin>>expr;
+                
+                cout<<"The operator precendence of "<< expr<<" expression is "<< OperatorsByPrecedence(expr.c_str()) <<" \n";
+                cout<<"\n\n..................................................................................................\n\n";
+                break;
+            case 3:
+                cout<<"\n\n..................................................................................................\n\n";
+                cout<<"-----------------You are working on Evaluate a postfix expression  ------------------------\n";
+                cout<<"Please enter the infix expression:";
+                cin>>expr;
+                cout<<"The evaluation of "<< expr<<" expression is "<< EVLUATE_POSTFIX( INFIX_TO_POSTFIX(expr).c_str())<<" \n";
+                cout<<"\n\n..................................................................................................\n\n";
+                break;
+            case 4:
+                exit(0);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    return 0;
+}

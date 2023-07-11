@@ -1,0 +1,300 @@
+#include <iostream>
+
+using namespace std;
+
+// عقدة لإنشاء مكدس
+struct stack
+{
+//   لتخزين عناصر البيانات
+    char data[100];
+//   لحساب عدد العناصر
+    int count=0;
+//    لرسم حجم العناصر
+    int size=100;
+};
+
+//لدفع العناصر على المكدس
+stack* push(char data,stack* head)
+{
+//    ضع العنصر في المصفوفة باستخدام المكان الحالي
+    head->data[head->count]=data;
+//    زيادة عدد العناصر
+    head->count++;
+//    عودة الرأس
+    return head;
+}
+//للتحقق مما إذا كانت المكدس فارغة
+bool isEmpty(stack* head)
+{
+//    تحقق مما إذا كان الحجم صفرًا أم لا
+    if(head->count==0){
+//        إذا كان صفر يعود صحيحًا
+        return true;
+    }
+    else{
+//       آخر عودة كاذبة
+        return false;
+    }
+    
+}
+//الحصول على العنصر العلوي في المكدس
+char peek(stack* head)
+{
+//    إرجاع العنصر الأخير من المكدس باستخدام الموضع الأخير
+    return head->data[(head->count)-1];
+}
+//الحصول على طول المكدس
+int length(stack* head)
+{
+//    إرجاع العدد الحالي للعناصر
+    return head->count;
+}
+//إزالة آخر عنصر مدرج من المكدس
+stack* pop(stack* head)
+{
+//   فقط إنقاص عدد العناصر
+    head->count--;
+//    عودة الرأس
+    return head;
+}
+
+//طباعة المكدس
+void printStack(stack* head)
+{
+//    تحقق مما إذا كان المكدس يحتوي على أي عنصر أم لا
+    if(head->count==0){
+//        إذا كانت حزمة الطباعة فارغة فارغة
+        cout<<"Stack is empty"<<endl;
+    }
+    else{
+//       وإلا ابدأ من نهاية المصفوفة واجتاز حتى 0
+        cout<<"Stack: "<<endl;
+        for (int i=head->count-1; i>=0; i--) {
+//            اطبع في كل مرة عنصر المكدس
+            cout<<head->data[i]<<" ";
+        }
+    }
+}
+
+// للتحقق من استيفاء المشغل
+int precedence(char character)
+{
+//    القوة تحصل على أعلى أسبقية
+    if(character == '^')
+        return 3;
+    else if(character == '*' || character == '/')
+        // الضرب والقسمة لهما أسبقية متساوية
+        return 2;
+    else if(character == '+' || character == '-')
+//       الجمع والطرح للحصول على 1
+        return 1;
+    else
+//       آخر -1
+        return -1;
+}
+//تحقق مما إذا كانت الشخصية عامل أم لا
+bool isOperator(char character)
+{
+//    تحقق مما إذا لم يكن alphabet وليس رقمًا ، فيجب أن يكون عاملًا
+    return (!isalpha(character) && !isdigit(character));
+}
+//تحويل infix إلى postfix
+// الحصول على تعبير السلسلة كما بارامتر
+string INFIX_TO_POSTFIX(string expr)
+{
+    
+//    الحصول على حجم experssion
+    int l = (int)expr.size();
+//    إنشاء مكدس جديد لتخزين المشغل والمعاملات
+    stack* st= new stack();
+//    سلسلة postfix مائلة
+    string output;
+//    اجتياز حتى طول experssion
+    for (int i = 0; i < l; i++) {
+        
+//       الشيك هو حرف أو رقم
+        if (isalpha(expr[i]) || isdigit(expr[i]))
+//           إذا كان الأمر كذلك ، قم بإلحاقه بسلسلة oiutput
+            output += expr[i];
+        
+        else {
+//           آخر تحقق مما إذا كان عامل التشغيل أم لا
+            if (isOperator(expr[i]))
+            {
+//                إذا تحقق المشغل من أسبقية هذا المشغل والمشغل أعلى المجموعة
+                    while(!isEmpty(st) && precedence(expr[i]) <= precedence(peek(st))) {
+//                        الحصول على آخر عامل تشغيل من المكدس وإلحاقه بإخراج إصبع القدم
+                                    output += peek(st);
+//    البوب ​​من المكدس
+                                pop(st);
+                    }
+//                   ادفع المشغل على المكدس
+                    st=push(expr[i],st);
+  
+            }
+        }
+    }
+//   بينما المكدس ليس فارغًا ، قم بإلحاق العامل المتبقي في سلسلة الإخراج
+    while (!isEmpty(st)) {
+//        احصل على العامل الأخير
+        output+=peek(st);
+//        عامل إزالة
+        st=pop(st);
+        
+    }
+//    عودة سلسلة الإخراج
+    return output;
+}
+//للحصول على عامل التشغيل بالأسبقية
+string OperatorsByPrecedence(string expr)
+{
+//    الحصول على حجم التعبير
+    int l = (int)expr.size();
+//    إنشاء كومة جديدة
+    stack* st= new stack();
+//    التعبير الناتج من المشغلين
+    string output;
+//    اجتياز حتى طول التعبير
+    for (int i = 0; i < l; i++) {
+        
+//        تحقق مما إذا كان الحرف أو الرقم لا يفعل شيئًا
+        if (isalpha(expr[i]) || isdigit(expr[i]))
+        {}
+        else {
+//            آخر تحقق مما إذا كان عامل التشغيل
+            if (isOperator(expr[i]))
+            {
+                //إذا تحقق المشغل من أسبقية هذا المشغل والمشغل أعلى المجموعة
+                   
+                    while(!isEmpty(st) && precedence(expr[i]) <= precedence(peek(st))) {
+//                        الحصول على نظرة خاطفة من المكدس
+                                    output += peek(st);
+//                        إزالة المشغل
+                                    pop(st);
+                    }
+                    
+//                   دفع العنصر الحالي إلى المكدس
+                    st=push(expr[i],st);
+                    
+            }
+        }
+    }
+    //   بينما المكدس ليس فارغًا ، قم بإلحاق العامل المتبقي في سلسلة الإخراج
+    while (!isEmpty(st)) {
+        //       احصل على العامل الأخير
+        output+=peek(st);
+        //       عامل إزالة
+        st=pop(st);
+        
+    }
+//    عودة الإخراج
+    return output;
+}
+// تقييم التعبير postfix
+int EVLUATE_POSTFIX(const char* exp)
+{
+//    إنشاء المكدس الجديد
+    stack* st=new stack();
+    int i;
+//  اجتياز كل التعبير
+    for (i = 0; exp[i]; ++i)
+    {
+//       تحقق مما إذا كان الرقم
+        if (isdigit(exp[i]))
+        {
+//           يدفع
+            st=push(exp[i],st);
+        }
+
+        else
+        {
+//          احصل على القيم الأولى من المكدس اطرح 48 للحصول على الرقم من الحرف
+            int val1 = (peek(st)-48);
+//           قم بإزالة العنصر
+            st=pop(st);
+//         احصل على القيم الثانية من المكدس اطرح 48 للحصول على الرقم من الحرف
+            int val2 = (peek(st)-48);
+//            إزالة العنصر من المكدس
+            st=pop(st);
+//            التبديل بين المشغلين
+            switch (exp[i])
+            {
+            case '+':// إذا كانت الإضافة
+                    st=push((val2 + val1)+48,st);
+                    
+                    break;
+                case '-'://إذا كانت سلبية
+                    st=push((val2 - val1)+48,st);
+                   
+                    break;
+            case '*'://إذا كان الضرب
+                    st=push( (val2 * val1)+48,st);
+                   
+                    break;
+            case '/':// قطاع
+                    st=push((val2 / val1)+48,st);
+                    
+                    break;
+            }
+        }
+    }
+//    إرجاع العنصر العلوي من المكدس نتيجة التعبير
+    return (peek(st)-48);
+}
+int menu()
+{
+    cout<<"\t***** Expression Conversions/Evaluations Program *****\n\n";
+    cout<<"Please choose from the menu:\n";
+    cout<<"1- Convert an infix expression to its postfix expression\n";
+    cout<<"2- List the expression operators based on their precedence\n";
+    cout<<"3- Evaluate a postfix expression\n";
+    cout<<"4- Exit\n";
+    cout<<"Please press any number (1-6) to continue:";
+    int choice;
+    cin>>choice;
+    return choice;
+}
+int main()
+{
+    while (1) {
+        int ch=menu();
+//       احصل على الاختيار
+        string expr;
+//        التبديل بين الخيارات
+        switch (ch) {
+            case 1:// infix إلى postfix
+                cout<<"\n\n..................................................................................................\n\n";
+                cout<<"-----------------You are working on Converting infix to postfix expression  ------------------------\n";
+                cout<<"Please enter the infix expression:";
+                cin>>expr;
+                cout<<"The postfix expression of "<< expr<<" expression is "<< INFIX_TO_POSTFIX(expr)<<" expression\n";
+                cout<<"\n\n..................................................................................................\n\n";
+                break;
+            case 2:// الحصول على عوامل التشغيل بالأسبقية
+                cout<<"\n\n..................................................................................................\n\n";
+                cout<<"-----------------You are working on expression operators based on their precedence  ------------------------\n";
+                cout<<"Please enter the infix expression:";
+                cin>>expr;
+                
+                cout<<"The operator precendence of "<< expr<<" expression is "<< OperatorsByPrecedence(expr.c_str()) <<" \n";
+                cout<<"\n\n..................................................................................................\n\n";
+                break;
+            case 3:// قيم التعبير
+                cout<<"\n\n..................................................................................................\n\n";
+                cout<<"-----------------You are working on Evaluate a postfix expression  ------------------------\n";
+                cout<<"Please enter the infix expression:";
+                cin>>expr;
+                cout<<"The evaluation of "<< expr<<" expression is "<< EVLUATE_POSTFIX( INFIX_TO_POSTFIX(expr).c_str())<<" \n";
+                cout<<"\n\n..................................................................................................\n\n";
+                break;
+            case 4:
+                exit(0);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    return 0;
+}
